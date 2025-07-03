@@ -15,7 +15,7 @@ import (
 )
 
 // The DataSet can provide imagenet data.
-const imageInputSize = 224
+const imageInputSize = 32
 
 var imagenetDataFolder = flag.String("imagenet-data-folder", "",
 	"Specifies where the imagenet data is located at.")
@@ -116,6 +116,7 @@ func (d *DataSet) Next() (imageData []byte, labelData byte) {
 	img, _, err := image.Decode(f)
 	imgResized := imaging.Resize(img, imageInputSize, imageInputSize, imaging.Lanczos)
 	dieOnErr(err)
+
 	for i := 0; i < imageInputSize; i++ {
 		for j := 0; j < imageInputSize; j++ {
 			r, g, b, _ := imgResized.At(i, j).RGBA()
