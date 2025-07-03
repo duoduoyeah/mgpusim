@@ -17,6 +17,9 @@ import (
 var imagenetDataFolder = flag.String("imagenet-data-folder", "",
 	"Specifies where the imagenet data is located at.")
 
+// Size is the dimension of the image (both width and height)
+const size = 32
+
 // The DataSet can provide imagenet data.
 type DataSet struct {
 	mapClassToLabel map[string]int
@@ -92,7 +95,7 @@ func (d *DataSet) HasNext() bool {
 // in the dataset.
 func (d *DataSet) Next() (imageData []byte, labelData byte) {
 	var err error
-	var imageArray [224 * 224 * 3]byte
+	var imageArray [size * size * 3]byte
 	var label byte
 	var imagePath string
 	var className string
@@ -111,14 +114,15 @@ func (d *DataSet) Next() (imageData []byte, labelData byte) {
 	defer f.Close()
 
 	img, _, err := image.Decode(f)
-	img224 := imaging.Resize(img, 224, 224, imaging.Lanczos)
+	imgResized := imaging.Resize(img, size, size, imaging.Lanczos)
 	dieOnErr(err)
-	for i := 0; i < 224; i++ {
-		for j := 0; j < 224; j++ {
-			r, g, b, _ := img224.At(i, j).RGBA()
-			imageArray[i*j] = uint8(r >> 8)
-			imageArray[i*j+224*224] = uint8(g >> 8)
-			imageArray[i*j+224*224*2] = uint8(b >> 8)
+	for i := 0; i < size; i++ {
+		for j := 0; j < size; j++ {
+			r, g, b, _ := imgResized.At(i, j).RGBA()
+			idx := i*size + j
+			imageArray[idx] = uint8(r >> 8)
+			imageArray[idx+size*size] = uint8(g >> 8)
+			imageArray[idx+size*size*2] = uint8(b >> 8)
 		}
 	}
 

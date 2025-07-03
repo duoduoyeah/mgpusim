@@ -1,0 +1,46 @@
+(base) shiyuan@shiyuan-laptop:tinyvgg$ ./tinyvgg -timing -report-all
+Monitoring simulation with http://localhost:34079
+2025/06/23 16:38:13 /home/shiyuan/workspace/simulator/mgpusim/benchmarks/dnn/gputraining/dataparallelism.go:39: Epoch 0
+2025/06/23 16:38:13 /home/shiyuan/workspace/simulator/mgpusim/benchmarks/dnn/gputraining/dataparallelism.go:49: Batch 0
+Im2Col input [8 3 32 32], kernel [3 3], stride [1 1], padding [1 1], dilation [1 1], output [27 8192]
+2025/06/23 16:41:47 /home/shiyuan/workspace/simulator/mgpusim/driver/driver.go:117: Panic: Could not find parent task
+goroutine 1019 [running]:
+runtime/debug.Stack()
+	/usr/lib/go-1.22/src/runtime/debug/stack.go:24 +0x5e
+runtime/debug.PrintStack()
+	/usr/lib/go-1.22/src/runtime/debug/stack.go:16 +0x13
+github.com/sarchlab/mgpusim/v3/driver.(*Driver).runEngine.func1()
+	/home/shiyuan/workspace/simulator/mgpusim/driver/driver.go:118 +0xaa
+panic({0x9aa060?, 0xc5ebb0?})
+	/usr/lib/go-1.22/src/runtime/panic.go:770 +0x132
+github.com/sarchlab/mgpusim/v3/timing/cu.(*CPIStackTracer).handleReqEnd(0xc0054e40e0, {{0xc033d5dba8, 0x11}, {0xc023f132b0, 0x9}, {0xa5d6fb, 0x7}, {0x9797b9, 0xc}, {0xc000c229f0, ...}, ...})
+	/home/shiyuan/workspace/simulator/mgpusim/timing/cu/cpistacktracer.go:312 +0x205
+github.com/sarchlab/mgpusim/v3/timing/cu.(*CPIStackTracer).handleTaskEnd(0xc0054e40e0, {{0xc033d5dba8, 0x11}, {0xc023f132b0, 0x9}, {0xa5d6fb, 0x7}, {0x9797b9, 0xc}, {0xc000c229f0, ...}, ...})
+	/home/shiyuan/workspace/simulator/mgpusim/timing/cu/cpistacktracer.go:359 +0xf8
+github.com/sarchlab/mgpusim/v3/timing/cu.(*CPIStackTracer).EndTask(0xc0054e40e0, {{0xc02563e720, 0x11}, {0x0, 0x0}, {0x0, 0x0}, {0x0, 0x0}, {0x0, ...}, ...})
+	/home/shiyuan/workspace/simulator/mgpusim/timing/cu/cpistacktracer.go:232 +0x105
+github.com/sarchlab/akita/v3/tracing.(*traceHook).Func(0xf?, {{0x71374cd70958, 0xc000d68508}, 0xf5f310, {0xa2e7e0, 0xc03381e120}, {0x0, 0x0}})
+	/home/shiyuan/go/pkg/mod/github.com/sarchlab/akita/v3@v3.0.0/tracing/tracehook.go:39 +0x23e
+github.com/sarchlab/akita/v3/sim.(*HookableBase).InvokeHook(...)
+	/home/shiyuan/go/pkg/mod/github.com/sarchlab/akita/v3@v3.0.0/sim/hook.go:81
+github.com/sarchlab/akita/v3/tracing.EndTask({0xc02563e720, 0x11}, {0xc65ec0, 0xc000d68508})
+	/home/shiyuan/go/pkg/mod/github.com/sarchlab/akita/v3@v3.0.0/tracing/api.go:151 +0x179
+github.com/sarchlab/akita/v3/tracing.TraceReqFinalize({0xc60ba0?, 0xc01ccc3b80?}, {0xc65ec0, 0xc000d68508})
+	/home/shiyuan/go/pkg/mod/github.com/sarchlab/akita/v3@v3.0.0/tracing/api.go:208 +0x54
+github.com/sarchlab/mgpusim/v3/timing/cu.(*ComputeUnit).handleScalarDataLoadReturn(0xc000d68508, 0x3f545483c3771640, 0xc012b95700)
+	/home/shiyuan/workspace/simulator/mgpusim/timing/cu/computeunit.go:472 +0x1b3
+github.com/sarchlab/mgpusim/v3/timing/cu.(*ComputeUnit).processInputFromScalarMem(0xc000d68508, 0x3f545483c3771640)
+	/home/shiyuan/workspace/simulator/mgpusim/timing/cu/computeunit.go:439 +0x65
+github.com/sarchlab/mgpusim/v3/timing/cu.(*ComputeUnit).processInput(0xc000d68508, 0x3f545483c3771640)
+	/home/shiyuan/workspace/simulator/mgpusim/timing/cu/computeunit.go:171 +0x65
+github.com/sarchlab/mgpusim/v3/timing/cu.(*ComputeUnit).Tick(0xc000d68508, 0x3f545483c3771640)
+	/home/shiyuan/workspace/simulator/mgpusim/timing/cu/computeunit.go:120 +0xe5
+github.com/sarchlab/akita/v3/sim.(*TickingComponent).Handle(0xc000ea2bc0, {0xc642e8?, 0xc014d20d80?})
+	/home/shiyuan/go/pkg/mod/github.com/sarchlab/akita/v3@v3.0.0/sim/ticker.go:140 +0x3f
+github.com/sarchlab/akita/v3/sim.(*SerialEngine).Run(0xc0000ea2d0)
+	/home/shiyuan/go/pkg/mod/github.com/sarchlab/akita/v3@v3.0.0/sim/serialengine.go:96 +0x357
+github.com/sarchlab/mgpusim/v3/driver.(*Driver).runEngine(0xc0000f69c0)
+	/home/shiyuan/workspace/simulator/mgpusim/driver/driver.go:125 +0xaa
+created by github.com/sarchlab/mgpusim/v3/driver.(*Driver).runAsync in goroutine 50
+	/home/shiyuan/workspace/simulator/mgpusim/driver/driver.go:108 +0x18a
+

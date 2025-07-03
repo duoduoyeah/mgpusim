@@ -52,17 +52,18 @@ func NewFullyConnectedLayer(
 
 // Randomize initialize the parameters of the layer randomly.
 func (l *FullyConnectedLayer) Randomize() {
+	r := rand.New(rand.NewSource(1))
 	numWeight := l.InputSize * l.OutputSize
 	weights := make([]float64, numWeight)
 	for i := 0; i < numWeight; i++ {
-		weights[i] = (rand.Float64() - 0.5) / float64(l.InputSize) * 2
+		weights[i] = (r.Float64() - 0.5) / float64(l.InputSize) * 2
 	}
 	l.to.Init(l.weights, weights)
 
 	numBias := l.OutputSize
 	bias := make([]float64, numBias)
 	for i := 0; i < numBias; i++ {
-		bias[i] = rand.Float64()*2 - 1
+		bias[i] = r.Float64()*2 - 1
 	}
 	l.to.Init(l.bias, bias)
 }

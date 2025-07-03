@@ -141,6 +141,8 @@ type CPIStackTracer struct {
 	instCount            uint64
 	valuInstCount        uint64
 	runningWFCount       uint64
+
+	instChildTaskIDs map[string]map[string]struct{}
 }
 
 // NewCPIStackInstHook creates a CPIStackInstHook object.
@@ -167,6 +169,7 @@ func NewCPIStackInstHook(
 			taskTypeScalarMem:     0,
 			taskTypeVALU:          0,
 		},
+		instChildTaskIDs: make(map[string]map[string]struct{}),
 	}
 
 	return h
@@ -228,6 +231,17 @@ func (h *CPIStackTracer) StepTask(task tracing.Task) {
 func (h *CPIStackTracer) EndTask(task tracing.Task) {
 	originalTask, found := h.inflightTasks[task.ID]
 	if found {
+		if children, exists := h.instChildTaskIDs[task.ParentID]; exists {
+			delete(children, task.ID)
+		}
+	}
+
+	// if children, exists := h.instChildTaskIDs[task.ID]; exists && len(children) != 0 && originalTask.What == "Scalar" {
+	// 	fmt.Println("task ID:", task.ID, originalTask.What, "reject to end since it has more than 1 child")
+	// 	return
+	// }
+
+	if found {
 		delete(h.inflightTasks, task.ID)
 		h.handleTaskEnd(originalTask)
 	}
@@ -273,6 +287,36 @@ func (h *CPIStackTracer) handleReqStart(task tracing.Task) {
 			panic("Could not find parent task")
 		}
 
+		if _, exists := h.instChildTaskIDs[parentTask.ID]; !exists {
+			h.instChildTaskIDs[parentTask.ID] = make(map[string]struct{})
+		}
+
+		h.instChildTaskIDs[parentTask.ID][task.ID] = struct{}{}
+		// if parentTask.What == "Scalar" {
+		// 	fmt.Printf("[WARN] Parent Task: What: %s, ID: %s, Kind: %s, Where: %s\n",
+		// 		parentTask.What, parentTask.ID, parentTask.Kind, parentTask.Where)
+		// 	fmt.Printf("[WARN] Current Child: What: %s, ID: %s, Kind: %s, Where: %s\n",
+		// 		task.What, task.ID, task.Kind, task.Where)
+		// }
+
+		// if parentTask.What == "Scalar" && len(h.instChildTaskIDs[parentTask.ID]) > 1 {
+		// 	var firstChildID string
+		// 	for childID := range h.instChildTaskIDs[parentTask.ID] {
+		// 		firstChildID = childID
+		// 		break
+		// 	}
+		// 	firstChild := h.inflightTasks[firstChildID]
+		// 	fmt.Printf("[WARN] Parent Task: What: %s, ID: %s, Kind: %s, Where: %s\n",
+		// 		parentTask.What, parentTask.ID, parentTask.Kind, parentTask.Where)
+		// 	fmt.Printf("[WARN] First Child: What: %s, ID: %s, Kind: %s, Where: %s\n",
+		// 		firstChild.What, firstChild.ID, firstChild.Kind, firstChild.Where)
+		// 	fmt.Printf("[WARN] Current Child: What: %s, ID: %s, Kind: %s, Where: %s\n",
+		// 		task.What, task.ID, task.Kind, task.Where)
+		// 	if task.ID == firstChild.ID {
+		// 		fmt.Println("DUPLICATE!")
+		// 	}
+		// }
+
 		if parentTask.What == "VMem" {
 			task.What = "VectorMemTransaction"
 			h.handleRegularTaskStart(task)
@@ -302,6 +346,19 @@ func (h *CPIStackTracer) handleRegularTaskEnd(task tracing.Task) {
 	}
 
 	h.inFlightTaskCountMap[currentTaskType]--
+
+	switch task.ID {
+	case "903263":
+		fmt.Println("[DEBUG] In cpistacktracer.go, handleRegularTaskEnd(), the error inst task end.")
+	case "903298":
+		fmt.Println("[DEBUG] In cpistacktracer.go, handleRegularTaskEnd(), another no-error inst end")
+	case "904648_req_out", "904649_req_out":
+		fmt.Printf("[DEBUG] In cpistacktracer.go, handleRegularTaskEnd(), no-error-req_out, current task.ID is %s\n", task.ID)
+	case "904801_req_out", "904802_req_out":
+		fmt.Printf("[DEBUG] In cpistacktracer.go, handleRegularTaskEnd(), error-req_out, current task.ID is %s\n", task.ID)
+	}
+
+	delete(h.instChildTaskIDs, task.ID)
 }
 
 func (h *CPIStackTracer) handleReqEnd(task tracing.Task) {
@@ -309,8 +366,25 @@ func (h *CPIStackTracer) handleReqEnd(task tracing.Task) {
 		parentTask, found := h.inflightTasks[task.ParentID]
 
 		if !found {
+			fmt.Printf("[Debug] Parent task not found. ParentID: %s\n"+
+				"[Debug] Current Task: What: %s, ID: %s, Kind: %s, Where: %s\n",
+				task.ParentID, task.What, task.ID, task.Kind, task.Where)
+			if task.ID == "904802_req_out" {
+				return
+			}
 			panic("Could not find parent task")
 		}
+
+		// fmt.Printf("[Debug] Found parent task: ID: %s, "+
+		// 	"What: %s, "+
+		// 	"Kind: %s, "+
+		// 	"Where: %s\n",
+		// 	parentTask.ID, parentTask.What, parentTask.Kind, parentTask.Where)
+		// fmt.Printf("[Debug] Current task: ID: %s, "+
+		// 	"What: %s, "+
+		// 	"Kind: %s, "+
+		// 	"Where: %s\n",
+		// 	task.ID, task.What, task.Kind, task.Where)
 
 		if parentTask.What == "VMem" {
 			task.What = "VectorMemTransaction"

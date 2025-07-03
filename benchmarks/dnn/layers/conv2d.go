@@ -75,17 +75,18 @@ func (l *Conv2D) numBias() int {
 
 // Randomize will randomly initialize the layer parmeters.
 func (l *Conv2D) Randomize() {
+	r := rand.New(rand.NewSource(1))
 	// numWeightPerKernel := l.numWeight() / l.kernelSize[0]
 	weights := make([]float64, l.numWeight())
 	for i := 0; i < l.numWeight(); i++ {
-		weights[i] = (rand.Float64() - 0.5) / float64(l.numWeight())
+		weights[i] = (r.Float64() - 0.5) / float64(l.numWeight())
 	}
 	l.to.Init(l.weights, weights)
 
 	numBias := l.numBias()
 	bias := make([]float64, numBias)
 	for i := 0; i < numBias; i++ {
-		bias[i] = rand.Float64()*2 - 1
+		bias[i] = r.Float64()*2 - 1
 	}
 	l.to.Init(l.bias, bias)
 }

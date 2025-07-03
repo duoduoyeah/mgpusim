@@ -1,6 +1,7 @@
 package cu
 
 import (
+	"fmt"
 	"log"
 
 	"github.com/sarchlab/akita/v3/mem/mem"
@@ -164,7 +165,7 @@ func (s *SchedulerImpl) DoFetch(now sim.VTimeInSec) bool {
 func (s *SchedulerImpl) DoIssue(now sim.VTimeInSec) bool {
 	madeProgress := false
 
-	if s.isPaused == false {
+	if !s.isPaused {
 		wfs := s.issueArbiter.Arbitrate(s.cu.WfPools)
 		for _, wf := range wfs {
 			if wf.InstToIssue.ExeUnit == insts.ExeUnitSpecial {
@@ -179,7 +180,9 @@ func (s *SchedulerImpl) DoIssue(now sim.VTimeInSec) bool {
 				wf.InstToIssue = nil
 
 				s.cu.logInstTask(now, wf, wf.DynamicInst(), false)
-
+				if wf.DynamicInst().ID == "903263" {
+					fmt.Println("[DEBUG] In scheduler.go, DoIssue(), the error inst task just got issued and be a task.")
+				}
 				unit.AcceptWave(wf, now)
 				wf.State = wavefront.WfRunning
 				//s.removeStaleInstBuffer(wf)

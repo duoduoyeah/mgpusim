@@ -470,10 +470,10 @@ func (cu *ComputeUnit) handleScalarDataLoadReturn(
 	cu.InFlightScalarMemAccess = cu.InFlightScalarMemAccess[1:]
 
 	tracing.TraceReqFinalize(req, cu)
-	cu.logInstTask(now, wf, info.Inst, true)
 
 	if cu.isLastRead(req) {
 		wf.OutstandingScalarMemAccess--
+		cu.logInstTask(now, wf, info.Inst, true)
 	}
 }
 
