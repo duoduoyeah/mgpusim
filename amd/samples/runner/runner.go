@@ -55,6 +55,9 @@ func (r *Runner) Init() *Runner {
 
 	r.createUnifiedGPUs()
 
+	// for _, component := range r.simulation.ComponentNames() {
+	// 	fmt.Println(component)
+	// }
 	return r
 }
 
