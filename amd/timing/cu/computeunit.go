@@ -232,6 +232,7 @@ func (cu *ComputeUnit) sendToCP() bool {
 		return false
 	}
 
+	print(cu.Name(), " send to cp")
 	sendErr := cu.ToCP.Send(cu.toSendToCP)
 	if sendErr == nil {
 		cu.toSendToCP = nil
