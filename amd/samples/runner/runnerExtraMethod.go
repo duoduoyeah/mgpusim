@@ -34,6 +34,15 @@ func (r *Runner) DumpGpuViz(path string) {
 	for _, component := range r.simulation.Components() {
 		var componentName string = component.Name()
 		ports := component.Ports()
+
+		// Debug Logic: Print info for 'command processor' component
+		if componentName == "GPU[1].CommandProcessor" {
+			println("Component Name:", componentName)
+			for _, port := range ports {
+				println("  Port Name:", port.Name())
+			}
+		}
+
 		portDumps := []PortDump{}
 		for _, port := range ports {
 			incoming := port.GetIncomingPorts()
