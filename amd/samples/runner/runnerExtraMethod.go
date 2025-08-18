@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"os"
 	"path/filepath"
+	"time"
 
 	"github.com/sarchlab/akita/v4/sim"
 )
@@ -35,14 +36,6 @@ func (r *Runner) DumpGpuViz(path string) {
 		var componentName string = component.Name()
 		ports := component.Ports()
 
-		// Debug Logic: Print info for 'command processor' component
-		if componentName == "GPU[1].CommandProcessor" {
-			println("Component Name:", componentName)
-			for _, port := range ports {
-				println("  Port Name:", port.Name())
-			}
-		}
-
 		portDumps := []PortDump{}
 		for _, port := range ports {
 			incoming := port.GetIncomingPorts()
@@ -70,8 +63,11 @@ func (r *Runner) DumpGpuViz(path string) {
 		panic(err)
 	}
 
-	// Create the full file path within the directory
-	filePath := filepath.Join(path, "gpu_viz.json")
+	// Generate filename with topology, component topology map, and current date
+	// Example: component_topology_map_20250818.json
+	dateStr := time.Now().Format("20060102")
+	fileName := "component_topology_map_" + dateStr + ".json"
+	filePath := filepath.Join(path, fileName)
 	err = os.WriteFile(filePath, jsonData, 0644)
 	if err != nil {
 		panic(err)
