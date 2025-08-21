@@ -165,6 +165,10 @@ func (r *Runner) Run() {
 		r.reporter.report()
 	}
 
+	if *visTracing {
+		r.DumpGpuViz()
+	}
+
 	r.Driver().Terminate()
 	r.simulation.Terminate()
 }
