@@ -49,7 +49,7 @@ func (r *Runner) DumpGpuViz(method ...string) {
 }
 
 func (r *Runner) DumpGpuVizSqlite() {
-	r.simulation.GetVisTracer().AddTopologyPortMap(r.simulation.Components())
+	r.simulation.GetMsgTracer().AddTopologyPortMap(r.simulation.Components())
 }
 
 func (r *Runner) CreateGPUDumpStruct() *VizDump {

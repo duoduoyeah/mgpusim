@@ -75,6 +75,9 @@ var visTraceEndTime = flag.Float64("trace-vis-end", -1,
 	"The end time of collecting visualization traces. A negative number"+
 		"means that the trace will be collected to the end of the simulation.")
 
+var msgTracing = flag.Bool("trace-msg", false,
+	"Generate trace for message passing purposes.")
+
 // parseFlag applies the runner flag to runner object
 func (r *Runner) parseFlag() *Runner {
 	r.parseSimulationFlags()

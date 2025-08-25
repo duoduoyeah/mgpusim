@@ -93,7 +93,12 @@ func (r *Runner) buildTimingPlatform() {
 
 	r.platform = b.Build()
 	r.reporter = newReporter(r.simulation)
+	r.configureTracing()
+}
+
+func (r *Runner) configureTracing() {
 	r.configureVisTracing()
+	r.configureMsgTracing()
 }
 
 func (r *Runner) configureVisTracing() {
@@ -104,6 +109,19 @@ func (r *Runner) configureVisTracing() {
 	visTracer := r.simulation.GetVisTracer()
 	for _, comp := range r.simulation.Components() {
 		tracing.CollectTrace(comp.(tracing.NamedHookable), visTracer)
+	}
+}
+
+func (r *Runner) configureMsgTracing() {
+	if !*msgTracing {
+		return
+	}
+
+	msgTracer := r.simulation.GetMsgTracer()
+	for _, comp := range r.simulation.Components() {
+		for _, port := range comp.Ports() {
+			tracing.CollectMsgTrace(port.(tracing.NamedHookable), msgTracer)
+		}
 	}
 }
 
@@ -165,7 +183,7 @@ func (r *Runner) Run() {
 		r.reporter.report()
 	}
 
-	if *visTracing {
+	if *msgTracing {
 		r.DumpGpuViz()
 	}
 
