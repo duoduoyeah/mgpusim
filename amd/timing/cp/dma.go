@@ -361,6 +361,7 @@ func NewDMAEngine(
 
 	dma.ToCP = sim.NewPort(dma, 40960000, 40960000, name+".ToCP")
 	dma.ToMem = sim.NewPort(dma, 64, 64, name+".ToMem")
-
+	dma.AddPort("ToCP", dma.ToCP)
+	dma.AddPort("ToMem", dma.ToMem)
 	return dma
 }
